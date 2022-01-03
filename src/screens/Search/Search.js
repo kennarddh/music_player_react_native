@@ -6,27 +6,61 @@ import {
 	FlatList,
 	TextInput,
 	Button,
+	Keyboard,
 } from 'react-native'
 
-import { GetMusics } from '../../utils/Api'
+import {
+	GetMusics,
+	SearchMusics,
+	MusicsNextPage,
+	SearchMusicsNextPage,
+} from '../../utils/Api'
 
 // components
 import Item from '../../components/Search/Item/Item'
 
 const Search = () => {
-	const [Musics, SetMusics] = useState({})
+	const [Musics, SetMusics] = useState([])
 	const [SearchText, SetSearchText] = useState('')
+	const [SearchLoadMoreText, SetSearchLoadMoreText] = useState('')
+	const [IsSearch, SetIsSearch] = useState(false)
 
-	const AsyncGetMusics = async name => {
-		const musics = await GetMusics(name)
+	const ListFooter = () => {
+		const LoadMore = () => {
+			if (IsSearch) {
+				SetMusics(
+					SearchMusicsNextPage(SearchLoadMoreText, Musics.length)
+				)
+			} else {
+				SetMusics(MusicsNextPage(Musics.length))
+			}
+		}
 
-		SetMusics(musics)
+		return <Button title='Load More' onPress={LoadMore} />
 	}
 
-	const Search = () => {
-		AsyncGetMusics(SearchText)
+	useEffect(() => {
+		const firstMusics = GetMusics()
 
-		SetSearchText('')
+		SetMusics(firstMusics)
+	}, [])
+
+	const Search = () => {
+		Keyboard.dismiss()
+
+		if (SearchText === '') {
+			SetMusics(GetMusics())
+			SetIsSearch(false)
+		} else {
+			const musics = SearchMusics(SearchText)
+
+			SetMusics(musics)
+
+			SetSearchLoadMoreText(SearchText)
+			SetSearchText('')
+
+			SetIsSearch(true)
+		}
 	}
 
 	return (
@@ -38,6 +72,7 @@ const Search = () => {
 						onChangeText={SetSearchText}
 						value={SearchText}
 						placeholder='Search'
+						onSubmitEditing={Search}
 					/>
 					<View style={Styles.search_button}>
 						<Button onPress={Search} title='Search' />
@@ -46,16 +81,18 @@ const Search = () => {
 				{Musics ? (
 					<>
 						<FlatList
-							data={Musics.items}
-							renderItem={Item}
+							style={Styles.list}
+							data={Musics}
+							renderItem={({ item }) => <Item item={item} />}
 							initialNumToRender={5}
 							removeClippedSubviews
-							keyExtractor={item => item.id.videoId}
+							keyExtractor={item => item.id}
+							ListFooterComponent={ListFooter}
 						/>
 					</>
 				) : (
 					<>
-						<Text>Fetching data from youtube data api v3</Text>
+						<Text>Loading</Text>
 					</>
 				)}
 			</View>
@@ -87,6 +124,9 @@ const Styles = StyleSheet.create({
 		width: '40%',
 		height: '80%',
 		borderRadius: 25,
+	},
+	list: {
+		height: '80%',
 	},
 })
 

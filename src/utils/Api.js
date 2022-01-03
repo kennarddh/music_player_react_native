@@ -1,23 +1,25 @@
-import { API_KEY } from '@env'
+import Musics from '../constants/Musics'
 
-const FetchData = endpoint => {
-	return fetch(endpoint, {
-		method: 'GET',
-	})
-		.then(response => response.json())
-		.catch(err => alert(err))
+export const GetMusics = (maxResults = 20) => {
+	return Musics.slice(0, maxResults)
 }
 
-export const GetMusics = (query, maxResults = 25) => {
-	return FetchData(
-		`https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=${maxResults}&q=${query}&type=video&videoCategoryId=10&key=${API_KEY}`
-	)
+export const SearchMusics = (query, maxResults = 20) => {
+	return Musics.filter(item =>
+		item.title.toLowerCase().includes(query.toLowerCase())
+	).slice(0, maxResults)
 }
 
-export const GetMusicNextPage = (NextPageToken, maxResults = 25) => {
-	return FetchData(
-		`https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=${maxResults}&pageToken=${NextPageToken}&type=video&videoCategoryId=10&key=${API_KEY}`
-	)
+export const MusicsNextPage = (lastResult, maxResults = 20) => {
+	return Musics.slice(0, maxResults + lastResult)
 }
 
-export default FetchData
+export const SearchMusicsNextPage = (query, lastResult, maxResults = 20) => {
+	return Musics.filter(item =>
+		item.title.toLowerCase().includes(query.toLowerCase())
+	).slice(0, maxResults + lastResult)
+}
+
+export const GetMusic = videoId => {
+	return Musics.filter(item => item.id === videoId)
+}

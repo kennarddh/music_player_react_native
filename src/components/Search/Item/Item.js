@@ -1,30 +1,56 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { StyleSheet, Text, View, Image } from 'react-native'
 
 import Icon from 'react-native-vector-icons/FontAwesome'
 
+// context
+import { PlaylistContext } from '../../../context/PlaylistContext'
+
 // components
 
 const Item = ({ item }) => {
+	const { Playlist, AddVideo, RemoveVideo } = useContext(PlaylistContext)
+
+	const AddToPlaylist = videoId => {
+		AddVideo(videoId)
+	}
+
+	const RemoveFromPlaylist = videoId => {
+		RemoveVideo(videoId)
+	}
+
 	return (
 		<>
-			<View key={item.id.videoId} style={Styles.container}>
+			<View style={Styles.container}>
 				<View style={Styles.left}>
 					<Image
 						style={Styles.thumbnail}
 						source={{
-							uri: item.snippet.thumbnails.default.url,
+							uri: item.artwork,
 						}}
 					/>
-					<Text style={Styles.title}>{item.snippet.title}</Text>
+					<Text style={Styles.title}>{item.title}</Text>
 				</View>
 				<View>
-					<Icon
-						name='play-circle'
-						size={30}
-						color='#000000'
-						onPress={() => {}}
-					/>
+					{Playlist.includes(item.id) ? (
+						<>
+							<Icon
+								name='minus'
+								size={30}
+								color='#000000'
+								onPress={() => RemoveFromPlaylist(item.id)}
+							/>
+						</>
+					) : (
+						<>
+							<Icon
+								name='plus'
+								size={30}
+								color='#000000'
+								onPress={() => AddToPlaylist(item.id)}
+							/>
+						</>
+					)}
 				</View>
 			</View>
 		</>
@@ -53,8 +79,8 @@ const Styles = StyleSheet.create({
 	},
 	thumbnail: {
 		marginRight: 10,
-		width: 120,
-		height: 90,
+		width: 100,
+		height: 100,
 	},
 })
 
