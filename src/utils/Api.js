@@ -21,5 +21,9 @@ export const SearchMusicsNextPage = (query, lastResult, maxResults = 20) => {
 }
 
 export const GetMusic = videoId => {
-	return Musics.filter(item => item.id === videoId)
+	const result = Musics.filter(item => item.id === videoId)
+
+	if (result) return result[0]
+
+	return {}
 }

@@ -11,6 +11,7 @@ import Header from './src/components/Header/Header'
 import Home from './src/screens/Home/Home'
 import Search from './src/screens/Search/Search'
 import Player from './src/screens/Player/Player'
+import Playlist from './src/screens/Playlist/Playlist'
 
 // context
 import PlaylistContextProvider from './src/context/PlaylistContext'
@@ -40,6 +41,15 @@ const App = () => {
 								),
 							}}
 							component={Search}
+						/>
+						<Drawer.Screen
+							name='Playlist'
+							options={{
+								header: props => (
+									<Header {...props} title='Playlist' />
+								),
+							}}
+							component={Playlist}
 						/>
 						<Drawer.Screen
 							name='Player'
